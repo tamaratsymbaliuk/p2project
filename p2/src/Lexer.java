@@ -9,10 +9,9 @@ public class Lexer implements Iterable<Lexer.Token> {
 
     public Lexer(String input) {
         this.input = input;
-        this.tokens = new ArrayList<Token>();
+        this.tokens = new ArrayList<>();
         this.current = 0;
         tokenize();
-
     }
 
     private void tokenize() {
@@ -33,98 +32,63 @@ public class Lexer implements Iterable<Lexer.Token> {
                 case '-':
                 case '*':
                 case '/':
-                    tokens.add(new Token(TokenType.OPERATOR,Character.toString(ch)));
+                case '>':
+                case '<':
+                    tokens.add(new Token(TokenType.OPERATOR, Character.toString(ch)));
                     current++;
                     break;
-                case '"':
-                    tokens.add(new Token(TokenType.STRING, readString()));
+                case '(':
+                case ')':
+                case '{':
+                case '}':
+                case ';':
+                    tokens.add(new Token(TokenType.PUNCTUATION, Character.toString(ch)));
                     current++;
-                    break;
-                case '%':
-                    tokens.add(new Token(TokenType.REFERENCES, readReference()));
                     break;
                 default:
-                    if (isDigit(ch)) {
+                    if (Character.isLetter(ch)) {
+                        tokens.add(new Token(TokenType.IDENTIFIER, readIdentifier()));
+                    } else if (Character.isDigit(ch)) {
                         tokens.add(new Token(TokenType.NUMBER, readNumber()));
-                    } else if (isAlpha(ch)) {
-                        String identifier = readIdentifier();
-                        tokens.add(new Token(deriveTokenType(identifier), identifier));
+                    } else if (ch == '"') {
+                        tokens.add(new Token(TokenType.STRING, readString()));
+                    } else if (ch == 'p' && input.substring(current, current + 5).equals("print")) {
+                        tokens.add(new Token(TokenType.PRINT, "print"));
+                        current += 5;
                     } else {
                         throw new LexerException("Unsupported character: " + ch);
                     }
-
-
-
             }
         }
-
-
-
-    }
-
-    private TokenType deriveTokenType(String identifier) {
-        return switch (identifier) {
-            case "config" -> TokenType.CONFIG;
-            case "update" -> TokenType.UPDATE;
-            case "compute" -> TokenType.COMPUTE;
-            case "show" -> TokenType.SHOW;
-            case "configs" -> TokenType.CONFIGS;
-            default -> TokenType.IDENTIFIER;
-        };
     }
 
     private String readIdentifier() {
         StringBuilder builder = new StringBuilder();
-        while (current < input.length() && isAlphaNumeric(input.charAt(current))) {
+        while (current < input.length() && (Character.isLetterOrDigit(input.charAt(current)) || input.charAt(current) == '_')) {
             builder.append(input.charAt(current));
             current++;
         }
-
         return builder.toString();
     }
 
     private String readNumber() {
         StringBuilder builder = new StringBuilder();
-        while (current < input.length() && isDigit(input.charAt(current))) {
+        while (current < input.length() && Character.isDigit(input.charAt(current))) {
             builder.append(input.charAt(current));
             current++;
         }
-
         return builder.toString();
-    }
-
-    private String readReference() {
-        StringBuilder builder = new StringBuilder();
-        current++;
-        while (current < input.length() && isAlphaNumeric(input.charAt(current))) {
-            builder.append(input.charAt(current));
-            current++;
-
-        }
-        return  builder.toString();
-    }
-
-    private boolean isAlphaNumeric(char c) {
-        return isAlpha(c) | isDigit(c);
-    }
-
-    private boolean isAlpha(char c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_';
-    }
-
-    private boolean isDigit(char c) {
-        return '0' <= c && c <= '9';
     }
 
     private String readString() {
         StringBuilder builder = new StringBuilder();
-        current++;
+        current++; // Move past the opening double quote
         while (current < input.length() && input.charAt(current) != '"') {
             builder.append(input.charAt(current));
             current++;
-
         }
-        return  builder.toString();
+        current++; // Move past the closing double quote
+        return builder.toString();
     }
 
     @Override
@@ -148,12 +112,9 @@ public class Lexer implements Iterable<Lexer.Token> {
                     ", value='" + value + '\'' +
                     '}';
         }
-
     }
+
     enum TokenType {
-        CONFIG, UPDATE, COMPUTE, SHOW, CONFIGS, STRING, NUMBER, IDENTIFIER, ASSIGNMENT, REFERENCES, OPERATOR
-
+        IDENTIFIER, NUMBER, ASSIGNMENT, OPERATOR, PUNCTUATION, STRING, PRINT
     }
-
-
 }
