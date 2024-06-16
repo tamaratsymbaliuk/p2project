@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Demo {
     public static void main(String[] args) {
@@ -16,6 +17,10 @@ public class Demo {
         for (Lexer.Token token: lexer) {
             System.out.println(token);
         }
+        List<Lexer.Token> tokens = lexer.getTokens(); // Use a method to get tokens
+        Parser parser = new Parser(tokens);
+        ASTNode root = parser.parse();
+        root.print(" ");
 
     }
 
