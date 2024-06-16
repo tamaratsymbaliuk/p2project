@@ -96,6 +96,10 @@ public class Lexer implements Iterable<Lexer.Token> {
         return tokens.iterator();
     }
 
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
     static class Token {
         final TokenType type;
         final String value;
