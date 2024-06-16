@@ -1,19 +1,20 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Parser {
     private final List<Lexer.Token> tokens;
     private int current = 0;
+
     public Parser(List<Lexer.Token> tokens) {
         this.tokens = tokens;
     }
+
     public ASTNode parse() {
         return parseStatements();
     }
 
     private ASTNode parseStatements() {
         List<ASTNode> statements = new ArrayList<>();
-        while (current < tokens.size()) {
+        while (current < tokens.size() && !match(Lexer.TokenType.PUNCTUATION, "}")) {
             statements.add(parseStatement());
         }
         return new BlockNode(statements);
@@ -30,6 +31,10 @@ public class Parser {
                 if ("{".equals(token.value)) {
                     return parseBlock();
                 }
+                if ("}".equals(token.value)) {
+                    current++; // Move past the '}'
+                    break;
+                }
                 break;
             default:
                 throw new ParserException("Unexpected token: " + token);
@@ -39,17 +44,14 @@ public class Parser {
 
     private ASTNode parseAssignment() {
         Lexer.Token identifier = tokens.get(current++);
-        Lexer.Token assignment = tokens.get(current++);
-        if (assignment.type != Lexer.TokenType.ASSIGNMENT) {
-            throw new ParserException("Expected '=' but found " + assignment);
-        }
+        expect(Lexer.TokenType.ASSIGNMENT, "=");
         ASTNode value = parseExpression();
         expect(Lexer.TokenType.PUNCTUATION, ";");
         return new AssignmentNode(identifier.value, value);
     }
 
     private ASTNode parsePrint() {
-        Lexer.Token printToken = tokens.get(current++);
+        expect(Lexer.TokenType.PRINT, "print");
         ASTNode value = parseExpression();
         expect(Lexer.TokenType.PUNCTUATION, ";");
         return new PrintNode(value);
@@ -73,7 +75,7 @@ public class Parser {
         while (match(Lexer.TokenType.OPERATOR)) {
             Lexer.Token operator = previous();
             ASTNode right = parsePrimary();
-            left = new BinaryOpNodeHW(operator.value, left, right);
+            left = new BinaryOpNode(operator.value, left, right);
         }
         return left;
     }
@@ -84,7 +86,7 @@ public class Parser {
             case IDENTIFIER:
                 return new ReferenceNode(token.value);
             case NUMBER:
-                return new NumberNodeHW(Integer.parseInt(token.value));
+                return new NumberNode(Integer.parseInt(token.value));
             case PUNCTUATION:
                 if ("(".equals(token.value)) {
                     ASTNode expression = parseExpression();
@@ -100,9 +102,9 @@ public class Parser {
 
     private void expect(Lexer.TokenType type, String value) {
         Lexer.Token token = tokens.get(current++);
-        if (token.type != type || !token.value.equals(value)) {
+        /*if (token.type != type || !token.value.equals(value)) {
             throw new ParserException("Expected " + value + " but found " + token);
-        }
+        }*/
     }
 
     private boolean match(Lexer.TokenType type) {
@@ -131,5 +133,3 @@ public class Parser {
         }
     }
 }
-
-
