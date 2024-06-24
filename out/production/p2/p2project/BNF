@@ -1,0 +1,18 @@
+<program> ::= <statement> | <program> <separator> <statement>
+<statement> ::= <expr> | <block>| <declaration>| <assignment>| <if_statement>| <print_statement>
+<declaration> ::= "var" <identifier> "=" <expression> ";"
+<assignment> ::= <identifier> "=" <expression> ";"
+<if_statement> ::= "if" "(" <condition> ")" <block> "else" <block>
+<block> ::= "{" <program> "}"
+<print_statement> ::= "print" <identifier> ";"
+<separator> ::= "\n" | ";"
+<condition> ::= <expression> <relational_operator> <expression>
+<expression> ::= <term> | <term> "+" <expression> | <term> "-" <expression>
+<term> ::= <factor> | <factor> "*" <term>| <factor> "/" <term>
+<factor> ::= <number> | <identifier> | "(" <expression> ")"
+<identifier> ::= <letter> | <identifier> <letter_or_digit>
+<number> ::= <digit> | <number> <digit>
+<letter> ::= "a" | "b" | "c" | ... | "z" | "A" | "B" | "C" | ... | "Z"
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter_or_digit> ::= <letter> | <digit>
+<relational_operator> ::= ">" | "<" | ">=" | "<=" | "==" | "!="
