@@ -1,4 +1,5 @@
-import java.util.ArrayList;
+package p2project;
+
 import java.util.List;
 
 public class Demo {
@@ -14,13 +15,14 @@ public class Demo {
                 print y;
                 """;
         Lexer lexer = new Lexer(input);
-        for (Lexer.Token token: lexer) {
+        for (Token token: lexer) {
             System.out.println(token);
         }
-        List<Lexer.Token> tokens = lexer.getTokens(); // Use a method to get tokens
+        List<Token> tokens = lexer.getTokens();// Use a method to get tokens
         Parser parser = new Parser(tokens);
         ASTNode root = parser.parse();
-        root.print(" ");
+        root.print("   ");
+
 
     }
 
