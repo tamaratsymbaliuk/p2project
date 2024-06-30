@@ -81,7 +81,7 @@ public class Parser {
     private ASTNode expression() {
         ASTNode node = term();
 
-        while (currentToken != null && (currentToken.type == Token.Type.PLUS || currentToken.type == Token.Type.MINUS)) {
+        while (currentToken != null && (currentToken.type == Token.Type.PLUS || currentToken.type == Token.Type.MINUS || currentToken.type == Token.Type.OPERATOR)) {
             Token token = currentToken;
             consume(token.type);
             node = new BinaryOpNode(node, term(), token);
@@ -100,7 +100,7 @@ public class Parser {
         return node;
     }
 
-    /*private ASTNode factor() {
+  private ASTNode factor() {
         Token token = currentToken;
 
         if (token.type == Token.Type.NUMBER) {
@@ -118,8 +118,9 @@ public class Parser {
 
         throw new ParserException("Unexpected token found for Factor: " + token);
     }
-     */
-    private ASTNode factor() {
+
+    /*
+   private ASTNode factor() {
         Token token = currentToken;
 
         if (token.type == Token.Type.NUMBER) {
@@ -142,11 +143,18 @@ public class Parser {
             ASTNode node = expression();
             consume(Token.Type.RPAREN);
             return node;
+        } else if (token.type == Token.Type.OPERATOR && token.value.equals("+")) {
+            consume(Token.Type.OPERATOR);
+            ASTNode node = expression();
+            return node;
+        }  else if (token.type == Token.Type.OPERATOR && token.value.equals("*")) {
+            consume(Token.Type.OPERATOR);
+            return new BinaryOpNode(factor(), factor(), token);
         } else {
             throw new ParserException("Unexpected token found for Factor: " + token);
         }
     }
-
+*/
     private ASTNode ifStatement() {
         consume(Token.Type.IF);  // Consume IF token
         consume(Token.Type.LPAREN);  // Expect and consume LPAREN
