@@ -6,16 +6,6 @@ import java.util.Map;
 public class Interpreter {
     private final Map<String, Integer> valueTable = new HashMap<>();
 
-    /*
-    var x = {
-        var y = 5
-        y - 5
-    }
-    // x -> 0
-    var z = 6 // x -> 0, z -> 6
-    z = 5 // x -> 0, z -> 5
-     */
-
     int visit(ASTNode node) {
         if (node instanceof BinaryOpNode binaryOpNode) {
             int left = visit(binaryOpNode.left);
