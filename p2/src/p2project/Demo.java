@@ -23,6 +23,15 @@ public class Demo {
         ASTNode root = parser.parse();
         root.print("   ");
 
+        // Adding SemanticAnalyzer
+        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+        semanticAnalyzer.visit(root);
+
+        // Adding Interpreter
+        Interpreter interpreter = new Interpreter();
+        int result = interpreter.visit(root);
+        System.out.println("Interpretation result: " + result);
+
 
     }
 
