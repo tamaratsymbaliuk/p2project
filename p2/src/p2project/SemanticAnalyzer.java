@@ -11,7 +11,6 @@ public class SemanticAnalyzer {
         visit(node);
     }
 
-
    public void visit(ASTNode node) {
         if (node instanceof BinaryOpNode) {
             visit(((BinaryOpNode)node).left);
