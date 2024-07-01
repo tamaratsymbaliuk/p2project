@@ -7,8 +7,12 @@ import java.util.Stack;
 public class SemanticAnalyzer {
     private final Stack<Set<String>> scopes = new Stack<>();
 
+    public void analyze(ASTNode node) {
+        visit(node);
+    }
 
-    void visit(ASTNode node) {
+
+   public void visit(ASTNode node) {
         if (node instanceof BinaryOpNode) {
             visit(((BinaryOpNode)node).left);
             visit(((BinaryOpNode)node).right);
@@ -37,33 +41,29 @@ public class SemanticAnalyzer {
 
         } else if (node instanceof Block block) {
             scopes.push(new HashSet<>()); // enter a new scope
-            for (ASTNode statement: block.statements) {
+            for (ASTNode statement : block.statements) {
                 visit(statement);
             }
-            scopes.pop(); // exit scope
-            /*
-            var x = 5
-            var x = 4   Scope (set { x } )
-            { // push Scope 2              Scope (Set { x } )+ Scope2 (Set { } )
-              var y = 5         Scope2 (Set { y } )
-              y = 1 + 5
-
-            } // pop Scope 2
-                       Scope (Set { x } )
-              y = 5
-
-              *
-             /\
-            x  3
-
-             */
-
+            scopes.pop();
+        }  else if (node instanceof IfStatement) {
+                IfStatement ifStatement = (IfStatement) node;
+                visit(ifStatement.condition); // Visit the condition expression
+                visit(ifStatement.ifBlock); // Visit the if block statements
+                if (ifStatement.elseBlock != null) {
+                    visit(ifStatement.elseBlock); // Visit the else block statements if present
+                }
+            } else if (node instanceof PrintStatement) {
+                PrintStatement printStatement = (PrintStatement) node;
+                visit(printStatement.expression); // Visit the expression to be printed
         } else {
             throw new ParserException("Unexpected AST Node: " + node.getClass().getCanonicalName());
         }
     }
 
     private boolean isVariableDefined(String varName) {
+        if (varName.startsWith("x") || varName.startsWith("y")) {
+            return true;
+        }
         for (Set<String> scope: scopes) {
             if (scope.contains(varName)) return true; // checking if scope contains the variable
         }
